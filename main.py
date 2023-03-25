@@ -1,9 +1,11 @@
 import os
+
+from pathlib import Path
 from time import perf_counter
-from src import download_images_concurrently, download_images_sequentially
+from src import download_images_concurrently
 
 
-NUMBER_OF_POKEMON = 493
+NUMBER_OF_POKEMON = 493+9 # check for next gen starters
 # Gen 1 - #151 Mew
 # ...
 # Gen 4 - #493 Arceus
@@ -15,8 +17,7 @@ NUMBER_OF_POKEMON = 493
 
 # STORE_PAGE_URL = 'https://originalstitch.com/pokemon/order/'
 SHIRT_PATTERN_URL = 'https://os-cdn.ec-ffmt.com/gl/pokemon/dedicate/pattern-flat/{pokemon_number:.0f}.jpg'
-TARGET_FOLDER = os.path.abspath('./out/')
-N_THREADS = 32
+TARGET_FOLDER = Path('./out/')
 
 
 def main():
@@ -29,22 +30,13 @@ def main():
     ]
 
     # check if target folder exists, and if not, prompt to create it
-    base_dl_folder = os.path.abspath(TARGET_FOLDER)
-    if not os.path.isdir(base_dl_folder):
-        if input(f'Folder not found. Create new directory on "{base_dl_folder}" ? (y/N)') in {'y', 'Y'}:
-            os.mkdir(base_dl_folder)
+    dl_folder = Path(TARGET_FOLDER)
+    if not dl_folder.is_dir():
+        if input(f'Create directory on "{dl_folder}" ? (y/N)') in {'y', 'Y'}:
+            dl_folder.mkdir(parents=True, exist_ok=True)
         else:
-            raise Exception('No valid target destination')
+            raise Exception('Could not create download directory.')
 
-    dl_folder = os.path.abspath(base_dl_folder)
-
-    #    # Sequential download approach
-    #    start_time = perf_counter()
-    #    status_sequential = download_images_sequentially(urls, dl_folder)
-    #    sequential_download_results = list(status_sequential)
-    #    print(f'Finished in {round(perf_counter() - start_time, 2)} seconds!')
-
-    # Concurrent download approach
     start_time = perf_counter()
     status_concurrent = download_images_concurrently(urls, dl_folder)
     concurrent_download_results = list(status_concurrent)

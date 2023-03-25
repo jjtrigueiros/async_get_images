@@ -1,2 +1,1 @@
-from .download_methods import download_images_concurrently, download_images_sequentially
-
+from .download_image import download_images_concurrently
