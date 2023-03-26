@@ -5,12 +5,11 @@ import logging
 import logging.handlers
 import mimetypes
 import queue
-import requests
 import shutil
-
 from pathlib import Path
 from urllib.parse import urlparse
 
+import requests
 
 log_queue = queue.Queue()
 queue_handler = logging.handlers.QueueHandler(log_queue)

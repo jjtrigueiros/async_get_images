@@ -1,0 +1,20 @@
+[tool.poetry]
+name = "async-get-images"
+version = "0.1.0"
+description = ""
+authors = ["J. Trigueiros <jjtrigueiros@gmail.com>"]
+readme = "README.md"
+packages = [{include = "src/async_get_images"}]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+opencv-python = "^4.7.0.72"
+
+[tool.poetry.group.dev.dependencies]
+black = "^23.1.0"
+flake8 = "^6.0.0"
+mypy = "^1.1.1"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

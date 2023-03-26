@@ -3,6 +3,9 @@
 
 # Program
 /out
+*.png
+*.jpg
+*.jpeg
 
 # Python
 **/__pycache__
