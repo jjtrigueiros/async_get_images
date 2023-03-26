@@ -1,7 +1,11 @@
-# image_scraper
+# async_get_images
+A simple asynchronous image fetcher. Download a set of images from a set of URLs using coroutines.
 
-A tiny image scraper built to bulk-download a list of wanted images while experimenting with multiprocessing.
+## Motivation: 
+This program was built as:
+- a way to bulk download the latest [Original Stitch Pokémon patterns](https://originalstitch.com/pokemon). These are tileable and make for some nice wallpapers or lock screen images.
+- a simple test project for async (and threads, in an earlier version).
 
-Built to bulk download the [Original Stitch Pokémon patterns](https://originalstitch.com/pokemon). Some considerations were taken regarding content types, as the image URLs don't match the actual content type received (ex. 444.jpg returns a .png).
+Some considerations were taken regarding mimetypes, as the default image URLs don't match the actual content type received (ex. 444.jpg returns a .png).
 
-Simply run the main script in the root directory.
+Run the main script (`./src/main`) to download all images (default download location: `./out/`).

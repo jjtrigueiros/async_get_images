@@ -1,62 +1,67 @@
 #!usr/bin/env python3
 
-import concurrent.futures
+import asyncio
 import logging
+import logging.handlers
+import mimetypes
+import queue
 import requests
 import shutil
 
-from functools import partial
-from mimetypes import guess_extension
 from pathlib import Path
 from urllib.parse import urlparse
 
-def download_image(url: str, dl_folder: Path):
+
+log_queue = queue.Queue()
+queue_handler = logging.handlers.QueueHandler(log_queue)
+logger = logging.getLogger(__name__)
+logger.addHandler(queue_handler)
+logger.setLevel("INFO")
+
+queue_listener = logging.handlers.QueueListener(log_queue, logging.StreamHandler())
+queue_listener.start()
+
+
+def download_image_sync(image_url: str, save_to_directory: Path) -> int:
     """
     Download and save an image to the provided directory using the image's default filename.
     """
 
     try:
-        r = requests.get(url, stream=True)
+        r = requests.get(image_url, stream=True)
     except requests.ConnectionError as conn_err:
-        logging.error("connection error downloading %s", conn_err)
+        logger.error("connection error downloading %s: %s", image_url, conn_err)
+
     if r.status_code == 200:
         r.raw.decode_content = True # needed to properly calculate file size before saving
 
         # Get file extension from headers
-        url_path = Path(urlparse(url).path)
+        url_path = Path(urlparse(image_url).path)
         if mimetype := r.headers.get('content-type'):
-            filename = url_path.with_suffix(guess_extension(mimetype)).name
+            extension = mimetypes.guess_extension(mimetype)
+            filename = url_path.with_suffix(extension).name
         else:
             filename = url_path.name
 
-        dl_target = dl_folder / filename
+        dl_target = save_to_directory / filename
 
         with open(dl_target, 'wb') as f:
             shutil.copyfileobj(r.raw, f)
-        logging.info(f'{url} successfully downloaded to {dl_target}.')
+        logger.info(f'Successfully downloaded {dl_target}.')
         return 0
     else:
-        logging.error(f'{url} not found : status code {r.status_code}')
+        logger.error(f'Image not found: {image_url} (status code {r.status_code})')
         return -1
 
 
-def download_images_concurrently(url_iterator: iter, dl_folder: Path, max_workers=32):
-    """
-    A simple script to concurrently download a list of images to the specified folder.
-    The original filename is kept.
+async def download_image_async(image_url: str, save_to_directory: Path):
+    return await asyncio.to_thread(download_image_sync, image_url, save_to_directory)
 
-    :param url_iterator: An iterable sequence of URLs
-    :param dl_folder: The target folder for the image downloads
-    :param max_workers: The maximum number of threads used for this operation
-    :return:
-    """
 
-    download_image_to_output_dir = partial(download_image, dl_folder=dl_folder)
-
-    with concurrent.futures.ThreadPoolExecutor(max_workers=max_workers) as executor:
-        results = executor.map(download_image_to_output_dir, url_iterator)
-    return results
+async def download_image_set_async(url_iterator: iter, save_to_directory: Path):
+    return await asyncio.gather(*[download_image_async(url, save_to_directory) for url in url_iterator])
 
 
 if __name__ == '__main__':
-    download_image('https://os-cdn.ec-ffmt.com/gl/pokemon/dedicate/pattern-flat/444.jpg', Path('./out/'))
+    # test downloading one image (URL is for a .jpg but return should be a .png)
+    asyncio.run(download_image_async('https://os-cdn.ec-ffmt.com/gl/pokemon/dedicate/pattern-flat/444.jpg', Path('./out/')), debug=True)
