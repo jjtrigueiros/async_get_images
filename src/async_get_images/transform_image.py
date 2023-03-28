@@ -1,6 +1,5 @@
 import cv2
 import numpy as np
-from cv2 import Mat
 
 SCALE_FACTOR: float = 1.5
 RESOLUTION: tuple[int, int] = (1440, 2560) # height x width
