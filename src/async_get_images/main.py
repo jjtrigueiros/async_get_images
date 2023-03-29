@@ -4,10 +4,13 @@ import asyncio
 
 from pathlib import Path
 from time import perf_counter
+
+import typer
+
 from download_image import download_image_set_async
 from lib import settings
 
-
+app = typer.Typer()
 
 
 # STORE_PAGE_URL = 'https://originalstitch.com/pokemon/order/'
@@ -17,8 +20,8 @@ DOWNLOAD_FROM_URLS = {
 }
 TARGET_FOLDER = Path('./out/')
 
-
-def main():
+@app.command()
+def download():
 
     urls = DOWNLOAD_FROM_URLS
 
@@ -37,4 +40,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    app()
