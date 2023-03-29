@@ -10,6 +10,9 @@ packages = [{include = "src/async_get_images"}]
 python = "^3.9"
 opencv-python = "^4.7.0.72"
 requests = "^2.28.2"
+typer = "^0.7.0"
+rich = "^13.3.3"
+shellingham = "^1.5.0.post1"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
