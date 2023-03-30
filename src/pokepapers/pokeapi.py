@@ -1,6 +1,6 @@
 import requests
 
-from lib import settings
+from .lib import settings
 
 
 class PokeAPI:
@@ -22,12 +22,3 @@ class PokeAPI:
         url = f"{self.api_url}/pokemon/?limit={settings.app.NUMBER_OF_POKEMON}"
         api_data = requests.get(url).json()
         return [pkmn["name"] for pkmn in api_data["results"]]
-
-
-if __name__ == "__main__":
-    pokemon = "finneon"
-
-    pa = PokeAPI()
-    if pokemon in pa.list_pokemon():
-        print(pa.get_id(pokemon))
-    print("bye")

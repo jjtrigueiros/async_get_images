@@ -63,14 +63,3 @@ async def download_image_async(image_url: str, save_to_directory: Path):
 async def download_image_set_async(url_iterator: Iterable, save_to_directory: Path):
     tasks = [download_image_async(url, save_to_directory) for url in url_iterator]
     return await asyncio.gather(*tasks)
-
-
-if __name__ == "__main__":
-    # test downloading one image (URL is for a .jpg but return should be a .png)
-    asyncio.run(
-        download_image_async(
-            "https://os-cdn.ec-ffmt.com/gl/pokemon/dedicate/pattern-flat/444.jpg",
-            Path("./out/"),
-        ),
-        debug=True,
-    )

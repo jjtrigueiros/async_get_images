@@ -9,6 +9,7 @@ import typer
 
 from .download_image import download_image_set_async
 from .lib import settings
+from .pokeapi import PokeAPI
 
 app = typer.Typer()
 
@@ -23,6 +24,7 @@ TARGET_FOLDER = Path("./out/")
 
 @app.command()
 def download():
+    """Downloads all Pokémon patterns into the configured output folder."""
     urls = DOWNLOAD_FROM_URLS
 
     # create output directory (prompt)
@@ -36,3 +38,11 @@ def download():
     start_time = perf_counter()
     asyncio.run(download_image_set_async(urls, dl_folder))
     print(f"Finished in {round(perf_counter() - start_time, 2)} seconds!")
+
+
+@app.command()
+def search(pkmn: str):
+    """Returns the pokémon National ID for a given pokémon name."""
+    client = PokeAPI()
+    id: int = client.get_id(pkmn)
+    print(id)

@@ -62,10 +62,3 @@ def create_wallpaper(
         output_path = str(output_path)
         cv2.imwrite(output_path, output_img)
     return output_img
-
-
-if __name__ == "__main__":
-    wp = create_wallpaper(IMAGE, "./out/result.png", *RESOLUTION, SCALE_FACTOR)
-    cv2.imshow("Output", wp)
-    cv2.waitKey(0)
-    cv2.destroyAllWindows
