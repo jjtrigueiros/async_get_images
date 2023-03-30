@@ -3,9 +3,13 @@
 
 # Program
 /out
-*.png
-*.jpg
-*.jpeg
+*.zip
+*.tar.xz
+*.7z
+
+# Testing/linting
+.mypy_cache
+.pytest_cache
 
 # Python
 **/__pycache__

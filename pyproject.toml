@@ -2,6 +2,11 @@
 max-line-length = 88
 ignore = ['E203']
 
+[tool.pytest.ini_options]
+pythonpath = [
+    "src", "src/async_get_images"
+]
+
 [tool.poetry]
 name = "async-get-images"
 version = "0.1.0"

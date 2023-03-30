@@ -1,3 +1,5 @@
+from pathlib import Path
+from typing import Optional, Union
 import cv2
 import numpy as np
 
@@ -18,12 +20,20 @@ IMAGE = "./out/131.jpg"
 # CROP: crop to scale_factor * target
 # RESIZE: resize (shrink) to target resolution
 def create_wallpaper(
-    input_path: str, output_path: str, width: int, height: int, scaling: float
+    input_path: Union[str, Path],
+    output_path: Optional[Union[str, Path]],
+    width: int,
+    height: int,
+    scaling: float,
 ) -> cv2.Mat:
+    if input_path:
+        input_path = str(input_path)
+    if output_path:
+        output_path = str(output_path)
     img = cv2.imread(input_path)
     source_resolution = np.array(img.shape)
-    target_resolution = np.array((width, height, 3))
-    resolution_scaler = np.array((SCALE_FACTOR, SCALE_FACTOR, 1))
+    target_resolution = np.array((height, width, 3))
+    resolution_scaler = np.array((scaling, scaling, 1))
 
     crop_size = (target_resolution * resolution_scaler).astype(int)
     tile_factor = np.ceil((crop_size / source_resolution)).astype(int)
@@ -31,7 +41,8 @@ def create_wallpaper(
     img = np.tile(img, tile_factor)
     img = img[: crop_size[0], : crop_size[1], :]  # crop
     img = cv2.resize(img, target_resolution[-2::-1])
-    cv2.imwrite(output_path, img)
+    if output_path:  # TODO: refactor for single responsibility
+        cv2.imwrite(output_path, img)
     return img
 
 
