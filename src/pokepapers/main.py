@@ -36,7 +36,3 @@ def download():
     start_time = perf_counter()
     asyncio.run(download_image_set_async(urls, dl_folder))
     print(f"Finished in {round(perf_counter() - start_time, 2)} seconds!")
-
-
-if __name__ == "__main__":
-    app()
