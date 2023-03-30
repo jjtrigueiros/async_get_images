@@ -1,21 +1,38 @@
+[tool.flake8]
+max-line-length = 88
+ignore = ['E203']
+
+[tool.pytest.ini_options]
+pythonpath = [
+    "src", "src/pokepapers"
+]
+
 [tool.poetry]
-name = "async-get-images"
+name = "pokepapers"
 version = "0.1.0"
 description = ""
 authors = ["J. Trigueiros <jjtrigueiros@gmail.com>"]
 readme = "README.md"
-packages = [{include = "src/async_get_images"}]
 
 [tool.poetry.dependencies]
 python = "^3.9"
 opencv-python = "^4.7.0.72"
 requests = "^2.28.2"
+typer = "^0.7.0"
+rich = "^13.3.3"
+shellingham = "^1.5.0.post1"
+pydantic = "^1.10.7"
 
 [tool.poetry.group.dev.dependencies]
 black = "^23.1.0"
 flake8 = "^6.0.0"
 mypy = "^1.1.1"
+pytest = "^7.2.2"
+flake8-pyproject = "^1.2.3"
+
+[tool.ruff.isort]
+profile = "black"
 
 [build-system]
-requires = ["poetry-core"]
+requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
