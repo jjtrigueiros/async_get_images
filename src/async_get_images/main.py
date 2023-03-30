@@ -7,8 +7,8 @@ from time import perf_counter
 
 import typer
 
-from download_image import download_image_set_async
-from lib import settings
+from .download_image import download_image_set_async
+from .lib import settings
 
 app = typer.Typer()
 

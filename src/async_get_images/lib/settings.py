@@ -9,7 +9,7 @@ class AppSettings(BaseSettings):
     class Config:
         case_sensitive = True
 
-    OUTPUT_DIRECTORY: Path = "./out/"
+    OUTPUT_DIRECTORY: Path = Path("./out/")
     POKEAPI_URL: str = "https://pokeapi.co/api/v2/"
     IMAGES_SOURCE_URL: str = (
         "https://os-cdn.ec-ffmt.com/gl/pokemon/dedicate/pattern-flat/"

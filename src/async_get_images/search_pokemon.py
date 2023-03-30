@@ -21,7 +21,7 @@ class PokeAPI:
         """
         url = f"{self.api_url}/pokemon/?limit={settings.app.NUMBER_OF_POKEMON}"
         api_data = requests.get(url).json()
-        return {pkmn["name"] for pkmn in api_data["results"]}
+        return [pkmn["name"] for pkmn in api_data["results"]]
 
 
 if __name__ == "__main__":

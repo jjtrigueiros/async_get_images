@@ -7,11 +7,12 @@ import mimetypes
 import queue
 import shutil
 from pathlib import Path
+from typing import Iterable
 from urllib.parse import urlparse
 
 import requests
 
-log_queue = queue.Queue()
+log_queue: queue.Queue = queue.Queue()
 queue_handler = logging.handlers.QueueHandler(log_queue)
 logger = logging.getLogger(__name__)
 logger.addHandler(queue_handler)
@@ -59,7 +60,7 @@ async def download_image_async(image_url: str, save_to_directory: Path):
     return await asyncio.to_thread(download_image_sync, image_url, save_to_directory)
 
 
-async def download_image_set_async(url_iterator: iter, save_to_directory: Path):
+async def download_image_set_async(url_iterator: Iterable, save_to_directory: Path):
     tasks = [download_image_async(url, save_to_directory) for url in url_iterator]
     return await asyncio.gather(*tasks)
 

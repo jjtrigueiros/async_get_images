@@ -15,22 +15,23 @@ IMAGE = "./out/131.jpg"
 # 7680 x 4320
 
 
+def load_image(self, path: Union[str, Path]) -> cv2.Mat:
+    return cv2.imread(str(path))
+
+
 # source resolution -> TILE -> CROP -> RESIZE -> target resolution
 # TILE: tile ceil(target/source) times
 # CROP: crop to scale_factor * target
 # RESIZE: resize (shrink) to target resolution
-def create_wallpaper(
-    input_path: Union[str, Path],
-    output_path: Optional[Union[str, Path]],
-    width: int,
-    height: int,
-    scaling: float,
+def transform_image(
+    img: cv2.Mat, width: int, height: int, scaling: float = 1.0
 ) -> cv2.Mat:
-    if input_path:
-        input_path = str(input_path)
-    if output_path:
-        output_path = str(output_path)
-    img = cv2.imread(input_path)
+    """
+    Tile an image `img` up to the size `width`x`height`.
+    The `scaling` factor, which should always be >1.0, allows downscaling of the
+    original tile image, which can hide undesirable visual artifacts.
+    """
+
     source_resolution = np.array(img.shape)
     target_resolution = np.array((height, width, 3))
     resolution_scaler = np.array((scaling, scaling, 1))
@@ -40,10 +41,27 @@ def create_wallpaper(
 
     img = np.tile(img, tile_factor)
     img = img[: crop_size[0], : crop_size[1], :]  # crop
-    img = cv2.resize(img, target_resolution[-2::-1])
-    if output_path:  # TODO: refactor for single responsibility
-        cv2.imwrite(output_path, img)
+    img = cv2.resize(img, target_resolution[1::-1])
+
     return img
+
+
+def create_wallpaper(
+    input_path: Union[str, Path],
+    output_path: Optional[Union[str, Path]],
+    width: int,
+    height: int,
+    scaling: float,
+) -> cv2.Mat:
+    input_path = str(input_path)
+    input_img = cv2.imread(input_path)
+
+    output_img = transform_image(input_img, width, height, scaling)
+
+    if output_path:
+        output_path = str(output_path)
+        cv2.imwrite(output_path, output_img)
+    return output_img
 
 
 if __name__ == "__main__":
