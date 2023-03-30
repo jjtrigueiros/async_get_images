@@ -1,3 +1,7 @@
+[tool.flake8]
+max-line-length = 88
+ignore = ['E203']
+
 [tool.poetry]
 name = "async-get-images"
 version = "0.1.0"
@@ -19,6 +23,9 @@ pydantic = "^1.10.7"
 black = "^23.1.0"
 flake8 = "^6.0.0"
 mypy = "^1.1.1"
+
+[tool.ruff.isort]
+profile = "black"
 
 [build-system]
 requires = ["poetry-core"]
