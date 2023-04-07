@@ -15,10 +15,6 @@ IMAGE = "./out/131.jpg"
 # 7680 x 4320
 
 
-def load_image(self, path: Union[str, Path]) -> cv2.Mat:
-    return cv2.imread(str(path))
-
-
 # source resolution -> TILE -> CROP -> RESIZE -> target resolution
 # TILE: tile ceil(target/source) times
 # CROP: crop to scale_factor * target
