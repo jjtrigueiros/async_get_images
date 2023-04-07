@@ -7,7 +7,7 @@ import mimetypes
 import queue
 import shutil
 from pathlib import Path
-from typing import Iterable
+from typing import Optional
 from urllib.parse import urlparse
 
 import requests
@@ -22,7 +22,9 @@ queue_listener = logging.handlers.QueueListener(log_queue, logging.StreamHandler
 queue_listener.start()
 
 
-def download_image_sync(image_url: str, save_to_directory: Path) -> int:
+def download_image_sync(
+    image_url: str, save_to_directory: Path, preferred_stem: str = ""
+) -> bool:
     """
     Download and save an image to the provided directory using the image's default
     filename.
@@ -32,6 +34,7 @@ def download_image_sync(image_url: str, save_to_directory: Path) -> int:
         r = requests.get(image_url, stream=True)
     except requests.ConnectionError as conn_err:
         logger.error("connection error downloading %s: %s", image_url, conn_err)
+        return False
 
     if r.status_code == 200:
         # needed to properly calculate file size before saving
@@ -39,27 +42,45 @@ def download_image_sync(image_url: str, save_to_directory: Path) -> int:
 
         # Get file extension from headers
         url_path = Path(urlparse(image_url).path)
-        if mimetype := r.headers.get("content-type"):
-            extension = mimetypes.guess_extension(mimetype)
+        if (mimetype := r.headers.get("content-type")) and (
+            extension := mimetypes.guess_extension(mimetype)
+        ):
             filename = url_path.with_suffix(extension).name
         else:
             filename = url_path.name
 
         dl_target = save_to_directory / filename
+        if preferred_stem:
+            dl_target = dl_target.with_stem(preferred_stem)
 
         with open(dl_target, "wb") as f:
             shutil.copyfileobj(r.raw, f)
         logger.info(f"Successfully downloaded {dl_target}.")
-        return 0
+        return True
     else:
         logger.error(f"Image not found: {image_url} (status code {r.status_code})")
-        return -1
+        return False
 
 
-async def download_image_async(image_url: str, save_to_directory: Path):
-    return await asyncio.to_thread(download_image_sync, image_url, save_to_directory)
+async def download_image_async(
+    image_url: str, dest_path: Path, preferred_stem: str = ""
+):
+    return await asyncio.to_thread(
+        download_image_sync, image_url, dest_path, preferred_stem
+    )
 
 
-async def download_image_set_async(url_iterator: Iterable, save_to_directory: Path):
-    tasks = [download_image_async(url, save_to_directory) for url in url_iterator]
+async def download_image_set_async(
+    urls: list[str], download_folder, preferred_stems: Optional[list[str]] = None
+):
+    if not preferred_stems:
+        tasks = [
+            download_image_async(url, download_folder)
+            for url in urls
+        ]
+    else:
+        tasks = [
+            download_image_async(url, download_folder, preferred_stem)
+            for (url, preferred_stem) in zip(urls, preferred_stems)
+        ]
     return await asyncio.gather(*tasks)
