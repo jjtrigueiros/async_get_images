@@ -1,11 +1,6 @@
-from pathlib import Path
-from typing import Optional, Union
 import cv2
 import numpy as np
 
-SCALE_FACTOR: float = 1.5
-RESOLUTION: tuple[int, int] = (1440, 2560)  # height x width
-IMAGE = "./out/131.jpg"
 
 # common resolutions (height x width):
 # 9:16
@@ -40,21 +35,3 @@ def transform_image(
     img = cv2.resize(img, target_resolution[1::-1])
 
     return img
-
-
-def create_wallpaper(
-    input_path: Union[str, Path],
-    output_path: Optional[Union[str, Path]],
-    width: int,
-    height: int,
-    scaling: float,
-) -> cv2.Mat:
-    input_path = str(input_path)
-    input_img = cv2.imread(input_path)
-
-    output_img = transform_image(input_img, width, height, scaling)
-
-    if output_path:
-        output_path = str(output_path)
-        cv2.imwrite(output_path, output_img)
-    return output_img
