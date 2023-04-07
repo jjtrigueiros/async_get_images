@@ -9,7 +9,7 @@ Download a list of tileable Pokémon-themed patterns and make wallpapers.
 ## Motivation: 
 This program was built as:
 - a way to bulk download the latest [Original Stitch Pokémon patterns](https://originalstitch.com/pokemon). These are tileable and make for some nice wallpapers or lock screen images.
-- a simple test project for async/coroutines and trying out CLI app developmnt with Typer.
+- a simple test project for async/coroutines and trying out CLI app development with Typer.
 
 Some considerations were taken regarding mimetypes, as the default image URLs don't match the actual content type received (ex. 444.jpg returns a .png).
 
