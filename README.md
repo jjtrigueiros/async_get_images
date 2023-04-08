@@ -13,5 +13,27 @@ This program was built as:
 
 Some considerations were taken regarding mimetypes, as the default image URLs don't match the actual content type received (ex. 444.jpg returns a .png).
 
-Run the module help (`python -m pokepapers --help`) to get started.
-Documentation will be expanded when core features are stabilized!
+
+## Usage:
+Install the module with Poetry and run it:
+```shell
+$ ppp --help
+```
+
+The main workflow is calling `ppp download` to pull all tileable images to the output folder and then generating an appropriate wallpaper with `ppp generate`.
+
+Pull all tileable images to a local folder:
+```shell
+$ ppp download
+```
+
+Generate a 1080p desktop wallpaper of your favorite image:
+```shell
+$ ppp generate lotad
+```
+
+Generate a wallpaper with a custom resolution or scale factor:
+```shell
+# ex.: 1440x3120p, vertical aspect ratio, scale factor 1.5
+$ ppp generate lotad 1440 3120 1.5
+```
