@@ -1,71 +1,59 @@
 #!usr/bin/env python3
 
-import asyncio
-
-from pathlib import Path
 from time import perf_counter
 
 import cv2
 import typer
 
-from .download_image import download_image_set_async
 from .lib import settings
-from .pokeapi import PokeAPI
-from .transform_image import transform_image
+from .lib.pokeapi import PokeAPI
+from .model.download_image import download_from_original_stitch
+from .model.pokemon import ALL_POKEMON
+from .model.transform_image import transform_image
 
 app = typer.Typer()
 client = PokeAPI()
 
 # STORE_PAGE_URL = 'https://originalstitch.com/pokemon/order/'
-LIST_OF_POKEMON: list[str] = client.list_pokemon()
-DOWNLOAD_FROM_URLS: list[str] = [
-    f"{settings.app.IMAGES_SOURCE_URL}{pokemon_id}.jpg"
-    for pokemon_id in range(1, settings.app.NUMBER_OF_POKEMON + 1)
-]
 
 
 @app.command()
 def download():
-    """Downloads all Pokémon patterns into the configured output folder."""
-    urls = DOWNLOAD_FROM_URLS
-    filenames = [f"{i+1}_{LIST_OF_POKEMON[i]}" for i in range(len(LIST_OF_POKEMON))]
-
-    # create output directory (prompt)
-    dl_folder = Path(settings.app.PATTERNS_DIRECTORY)
-    if not dl_folder.is_dir():
-        if input(f'Create directory on "{dl_folder}" ? (y/N)') in {"y", "Y"}:
-            dl_folder.mkdir(parents=True, exist_ok=True)
-        else:
-            raise Exception("Could not create download directory.")
-
+    """
+    Downloads all Pokémon patterns into the configured output folder.
+    Default: download from Original Stitch.
+    Planned: download from Serebii or Bulbapedia.
+    Planned (future): download from self-hosted API/DB.
+    """
     start_time = perf_counter()
-    asyncio.run(download_image_set_async(urls, dl_folder, filenames))
+    download_from_original_stitch()
     print(f"Finished in {round(perf_counter() - start_time, 2)} seconds!")
 
 
-def complete_name(incomplete: str):
-    for name in LIST_OF_POKEMON:
-        if name.startswith(incomplete):
-            yield name
+def autocomplete_pkmn_name(incomplete: str):
+    for pkmn in ALL_POKEMON:
+        if pkmn.name.startswith(incomplete):
+            yield pkmn.name
 
 
 @app.command()
 def search(
-    pkmn: str = typer.Argument(
-        "",
-        autocompletion=complete_name,
-    )
+    id_or_name: str = typer.Argument(
+        default=None,
+        autocompletion=autocomplete_pkmn_name,
+    ),
+    language: str = typer.Option(default="en")
 ):
     """Returns the pokémon National ID for a given pokémon name."""
 
     client = PokeAPI()
-    id: int = client.get_id(pkmn)
-    print(id)
+    species = client.get_pokemon_species(id_or_name)
+    print(f"#{species.id} - {species.get_proper_name(language)}")
 
 
 @app.command()
 def generate(
-    pkid: int = typer.Argument(""),
+    pokemon: str = typer.Argument(None, autocompletion=autocomplete_pkmn_name),
     width: int = typer.Argument(1920),
     height: int = typer.Argument(1080),
     scaling: float = typer.Argument(1.0),
@@ -74,13 +62,11 @@ def generate(
     Generates a wallpaper featuring the Pokémon with chosen ID,
     with the set width, height and scaling factor (default 1920x1080 at x1.0 scale).
     """
-    input_file = settings.app.PATTERNS_DIRECTORY / str(pkid)
-    if input_file.with_suffix(".png").is_file():
-        input_file = input_file.with_suffix(".png")
-    elif input_file.with_suffix(".jpg").is_file():
-        input_file = input_file.with_suffix(".jpg")
-    else:
-        raise Exception("Image not found")
+    # search for local file
+    local_matches = settings.app.PATTERNS_DIRECTORY.glob(f"**/*_{pokemon}*.*")
+    if not (input_file := next(local_matches, None)):
+        print("Image not found locally.")
+        return
 
     # generate output filename
     i, r = divmod(scaling, 1)
@@ -96,4 +82,3 @@ def generate(
     print(output_file)
     output_file.parent.mkdir(exist_ok=True)
     cv2.imwrite(str(output_file), output_image)
-    print(output_file.is_file())

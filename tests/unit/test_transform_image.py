@@ -3,7 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 
-from pokepapers import transform_image
+from pokepapers.model import transform_image
 
 
 RESOURCES = Path("./tests/unit/resources/")

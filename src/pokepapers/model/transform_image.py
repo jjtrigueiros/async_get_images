@@ -3,24 +3,26 @@ import numpy as np
 
 
 # common resolutions (height x width):
-# 9:16
-# 1080 x 1920
-# 1440 x 2560
-# 3840 x 2160
-# 7680 x 4320
+# desktop:
+# fhd: 1920 x 1080
+# qhd: 2560 x 1440
+# 4k: 2160 x 3840
+# 8k: 4320 x 7680
+
+# phones:
+# Pixel 7 Pro: 1440 x 3120
+# iPhone 14 Pro: 1179 x 2556
 
 
-# source resolution -> TILE -> CROP -> RESIZE -> target resolution
-# TILE: tile ceil(target/source) times
-# CROP: crop to scale_factor * target
-# RESIZE: resize (shrink) to target resolution
 def transform_image(
     img: cv2.Mat, width: int, height: int, scaling: float = 1.0
 ) -> cv2.Mat:
     """
-    Tile an image `img` up to the size `width`x`height`.
-    The `scaling` factor, which should always be >1.0, allows downscaling of the
-    original tile image, which can hide undesirable visual artifacts.
+    Tile and crop an image `img` up to the resolution given by `width`x`height`.
+
+    The `scaling` factor allows downscaling of the original tile image, to allow hiding
+    undesirable visual artifacts, ex. due to compression.
+    Since there is no benefit in upscaling, `scaling` should always be `>=1.0`.
     """
 
     source_resolution = np.array(img.shape)
