@@ -10,6 +10,8 @@ from .lib.pokeapi import PokeAPI
 from .model.download_image import download_from_original_stitch
 from .model.pokemon import ALL_POKEMON
 from .model.transform_image import transform_image
+from .resolutions import autocomplete_resolution_name, get_resolution_by_name
+
 
 app = typer.Typer()
 client = PokeAPI()
@@ -42,7 +44,7 @@ def search(
         default=None,
         autocompletion=autocomplete_pkmn_name,
     ),
-    language: str = typer.Option(default="en")
+    language: str = typer.Option(default="en"),
 ):
     """Returns the pokémon National ID for a given pokémon name."""
 
@@ -54,17 +56,24 @@ def search(
 @app.command()
 def generate(
     pokemon: str = typer.Argument(None, autocompletion=autocomplete_pkmn_name),
-    width: int = typer.Argument(1920),
-    height: int = typer.Argument(1080),
-    scaling: float = typer.Argument(1.0),
+    width: int = typer.Option(1920, "--width", "-w"),
+    height: int = typer.Option(1080, "--height", "-h"),
+    resolution_name: str = typer.Option(
+        None, "--resolution", "-r", autocompletion=autocomplete_resolution_name
+    ),
+    scaling: float = typer.Option(1.0, "--scaling", "-s"),
 ):
     """
     Generates a wallpaper featuring the Pokémon with chosen ID,
     with the set width, height and scaling factor (default 1920x1080 at x1.0 scale).
     """
-    # search for local file
-    local_matches = settings.app.PATTERNS_DIRECTORY.glob(f"**/*_{pokemon}*.*")
-    if not (input_file := next(local_matches, None)):
+    if resolution_name:  # override width and height
+        resolution = get_resolution_by_name(resolution_name)
+        width = resolution.width
+        height = resolution.height
+
+    img_local_matches = settings.app.PATTERNS_DIRECTORY.glob(f"**/*_{pokemon}*.*")
+    if not (input_file := next(img_local_matches, None)):
         print("Image not found locally.")
         return
 
