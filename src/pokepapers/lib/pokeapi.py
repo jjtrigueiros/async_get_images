@@ -13,17 +13,18 @@ class PokemonSpecies:
         self.name = self.json.get("name")
 
     def get_proper_name(self, language: str = "en") -> str:
-
         names: list[dict] = self.json.get("names")
         try:
             return next(
-                element["name"] for element in names 
+                element["name"]
+                for element in names
                 if element.get("language").get("name") == language
             )
         except StopIteration:
             # fallback to english name
             return next(
-                element["name"] for element in names 
+                element["name"]
+                for element in names
                 if element.get("language").get("name") == "en"
             )
 
@@ -43,6 +44,7 @@ class Language(BaseModel):
         ja
         pt-BR
     """
+
     id: int
     iso3166: str
     iso639: str
@@ -53,7 +55,7 @@ class Language(BaseModel):
         """
         Return this language's name in a given language.
 
-        Examples: 
+        Examples:
             - Language(es).name_in(Language(es)) -> Español
             - Language(es).name_in(Language(en)) -> Spanish
         """

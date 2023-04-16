@@ -2,18 +2,6 @@ import cv2
 import numpy as np
 
 
-# common resolutions (height x width):
-# desktop:
-# fhd: 1920 x 1080
-# qhd: 2560 x 1440
-# 4k: 2160 x 3840
-# 8k: 4320 x 7680
-
-# phones:
-# Pixel 7 Pro: 1440 x 3120
-# iPhone 14 Pro: 1179 x 2556
-
-
 def transform_image(
     img: cv2.Mat, width: int, height: int, scaling: float = 1.0
 ) -> cv2.Mat:
