@@ -2,7 +2,7 @@
 
 from time import perf_counter
 
-import cv2
+from PIL import Image
 import typer
 
 from .lib import settings
@@ -86,8 +86,8 @@ def generate(
         / input_file.with_stem(f"{input_file.stem}_{width}x{height}_{i}p{r}").name
     )
 
-    input_image = cv2.imread(str(input_file))
+    input_image = Image.open(input_file)
     output_image = transform_image(input_image, width, height, scaling)
     print(output_file)
     output_file.parent.mkdir(exist_ok=True)
-    cv2.imwrite(str(output_file), output_image)
+    output_image.save(output_file)
