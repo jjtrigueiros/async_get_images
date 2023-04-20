@@ -55,4 +55,9 @@ PRESET_RESOLUTIONS: list[Resolution] = [
         width=1179,
         height=2556,
     ),
+    Resolution(
+        identifiers=["samsung-galaxy-s23", "phone-samsung-galaxy-s23"],
+        width=1080,
+        height=2340,
+    ),
 ]
